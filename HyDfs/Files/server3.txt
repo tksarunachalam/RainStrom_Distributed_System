@@ -1,0 +1,4 @@
+Received updated task from leader:
+task_id:2  partition:1  worker_id:1 
+ parent_job:{job_id:"57371bb1-1881-4f28-8c4d-2887c0c5d1c3"  op1_exe:"split.py"  op2_exe:"count.py"  hydfs_src_file:"HyDfs/Files/business_1.txt"  hydfs_dest_file:"HyDfs/Files/HYDFS-Files/output.txt"  num_tasks:2  input_partitions:{file_name:"HyDfs/Files/business_1.txt"  end:499}  input_partitions:{id:1  file_name:"HyDfs/Files/business_1.txt"  start:500  end:999} 
+  output_partitions:{key:-1  value:4}  output_partitions:{key:0  value:2}  output_partitions:{key:1  value:3}  stage_tasks_worker_map:{key:2  value:{prevWorkers:0  prevWorkers:1}}  stage_tasks_worker_map:{key:3  value:{prevWorkers:0  prevWorkers:1}}  meta_data:{key:"lineCount"  value:"1000"}}

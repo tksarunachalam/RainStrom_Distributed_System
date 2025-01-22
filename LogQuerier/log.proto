@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package log;
+
+option go_package = "./log;log";
+
+service QueryService{
+    rpc ExecuteGrep(GrepRequest) returns (GrepResponse);
+}
+
+message GrepRequest{
+    repeated string flag =1;
+    string pattern = 2;
+    string fileName = 3;
+    
+}
+
+message GrepResponse{
+    string response = 1;
+    
+}

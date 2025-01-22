@@ -1,0 +1,84 @@
+Receiver failed:
+
+// Sender
+1. Create tuple id
+2. Create persistent connection to all Receiver for stage 2 based on job.OutputPartitions map
+3. Send the data continously
+4. Maintain a map of each sent tuple id and wait for ack
+5. If did get a ACK in time, resend the tuple
+6. Worker gets new target receiver from leader
+7. Worker send tuples which did not get ack to new target receiver 
+
+Sender failed:
+1. Leader reschedules whole tasks. New sender sends all tuples- reciver discards duplicates
+
+
+Receiver failed:
+1. Sender needs to know about target receive reassignment from leader 
+2. Sender sends all tuples which it did not receive a ACK to new target receiver
+
+
+
+Reschduled:
+// Receiver is getting the tuples as a input in this format:
+// type Output struct {
+// 	TupleId string
+// 	Key     string
+// 	Value   int
+// }
+1. Get Hydfs output file (using job.desthydfs file) and get count of each word so far (initializing teh count)
+2. receive tuple - process 
+2. check if present in AOL(append only logs) : discard if duplicate
+3. write to mp4-AOL:
+4. send ACK to sender for that tuple id
+5. write result to Hydfs file use the func below and crate append command instead using this:
+// func (worker *WorkerService) getHyDfsFile(fileName string) (bool, error) {
+
+// //add HDFS file path to the file name
+// filePath := filepath.Join(utils.HDFS_FILE_PATH, fileName)
+
+// readCommand := models.CreateCommand{
+// 	LocalFileName: "HyDfs/Files/" + fileName,
+// 	HydfsFileName: filePath,
+// }
+// resp := worker.hy.DoReadOperationClient(readCommand)
+// if resp.IsSuccess {
+// 	return true, nil
+
+// }
+
+// return false, fmt.Errorf("Error reading file: %v", resp.Message)
+
+// }
+
+
+
+
+Clearing the leader and worker queue:
+
+1. After for scanner loop in the util-tsks.go - send an ack to the leader for both task completions
+2. Clear the leader task queue upon receiving teh both task completion ack
+3. Afetr for scanner loop in the util-tsks.go clear worker queue for the task that is completed
+4. Check this for the reciver:
+func (s *RainStromServer) ExchangeTuples(stream pb.RainStromService_ExchangeTuplesServer) error {
+	for {
+		// Receive a tuple from the stream
+		tuple, err := stream.Recv()
+		if err == io.EOF {
+			
+			//Add to clear worker queue for this task
+			return nil // End of stream
+		}
+
+
+
+
+
+
+
+
+
+	1. Any worker can send job command 
+	2. Task completion not working
+	3. 
+

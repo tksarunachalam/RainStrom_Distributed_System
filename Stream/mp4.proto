@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package protos;
+option go_package = "../protos";
+
+// Define the Job message
+message Job {
+  string job_id = 1;
+  string op1_exe = 2;
+  string op2_exe = 3;
+  string hydfs_src_file = 4;
+  string hydfs_dest_file = 5;
+  int32 num_tasks = 6;
+  int32 src_worker = 11;
+  repeated Partition input_partitions = 7;
+  map<int32, int32> output_partitions = 8;
+  map<int32, PrevWorkerList> stage_tasks_worker_map = 10; // Updated field
+
+  map<string, string> meta_data = 9;
+}
+
+// Define the Partition message
+message Partition {
+  int32 id = 1;
+  string file_name = 2;
+  int32 start = 3;
+  int32 end = 4;
+  repeated string lines = 5;
+  map<int32, int32> hashKeyMap = 6; // New variable of type map<int, int>
+}
+
+// Define the Task message
+message Task {
+  int32 task_id = 1;
+  int32 partition = 2;
+  int32 worker_id = 3;
+  repeated string files = 4; // Array of strings
+  Job parent_job = 5; // Parent job
+  TaskType task_type = 6;
+}
+
+// Define an empty response message
+message Ack {
+  string message = 1;
+  ResponseType response_type = 2;
+  string TupleId = 3;
+  int32 TaskId = 4;
+  NotificationType notificationType = 5;
+
+}
+enum NotificationType {
+  LEADER = 0;
+  SENDER = 1;
+  RECEIVER = 2;
+}
+
+enum ResponseType {
+  SUCCESS = 0;
+  FAIL = 1;
+  RECEIVED = 2;
+  COMPLETED = 3;
+}
+
+enum TaskType {
+  TASK_1 = 0;
+  TASK_2 = 1;
+}
+message PrevWorkerList {
+    repeated int32 prevWorkers = 1;
+
+}
+
+service RainStromService {
+  // RPC method for sending a task from leader to worker
+  rpc SendTask(Task) returns (Ack);
+  rpc ExchangeTuples(stream Tuple) returns (stream Ack);
+  rpc TriggerConnectToWorkers(Empty) returns (Ack);
+  rpc UpdateTask(UpdateTaskRequest) returns (Ack);
+  rpc SendNotification(Ack) returns (Ack); // Add this line
+  rpc TransferCommand(Command) returns (Ack);
+}
+message Empty {}
+
+message UpdateTaskRequest {
+  Task task = 1;
+}
+
+message Tuple {
+    string TupleId = 1; // Unique ID for duplicate detection
+    string Key = 2;       // Key (e.g., word)
+    int32 Value = 3;     // Value (e.g., count)
+    int32 TaskId = 4;
+    int32 ReceiverTaskId = 5;
+}
+message Command {
+    int32 sender_id = 1; // ID of the sender (worker or leader)
+    int32 receiver_id = 2; // ID of the receiver
+    CommandType command_type = 3; // Type of command (e.g., "TASK_ASSIGNMENT", "STATUS_UPDATE")
+    bytes payload = 4; // Generic payload (e.g., JSON-encoded data)
+}
+
+enum CommandType {
+  RainStromRequest = 0;
+  ClearFiles = 1;
+  Merge = 2;
+}
+
+
+
+
+//protoc --go_out=. --go-grpc_out=. mp4.proto

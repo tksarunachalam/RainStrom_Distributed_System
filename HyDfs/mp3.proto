@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package hydfs;
+
+option go_package = "./protos";
+
+service HyDfsService{
+    rpc ExecuteFileSystem(FileRequest) returns (FilResponse);
+    rpc SendFile(stream FileSendRequest) returns (FileSendResponse);
+    rpc ReceiveFile(FileReceiveRequest) returns (stream FileReceiveReponse);
+    rpc ReplicateLogEntry(ReplicateRequest) returns (ReplicateResponse);
+    rpc ReadFile(FileReadRequest) returns (stream FileReadResponse);
+    rpc MultiAppend(FileTransferRequest) returns (MultiAppendResponse);
+    rpc MergeFile(FileTransferRequest) returns (MergeResponse);
+    rpc NotifyPrimaryToMerge(MergeRequest) returns (MergeResponse);
+    rpc WriteStreamResults(FileTransferRequest) returns (FileSendResponse);
+}
+
+message FileRequest{
+    //Request type, local file name (optional), HyDfs filename, file data(optional for create/merge)
+    RequestType type_req = 1;
+    optional string localFileName = 2;
+    string hydfsFileName = 3;
+    optional bytes f_data = 4;
+    
+}
+
+
+message FilResponse{
+    //ack, file version/meta data, file contents(optional), metadata(optional)
+   string ack =1;
+   float version =2;
+   optional bytes f_data = 3;
+   optional string metaData = 4;
+    
+}
+enum RequestType {
+  GET = 0;
+  CREATE = 1;
+  APPEND = 2;
+  DELETE = 3;
+  MERGE = 4;
+}
+
+message FileSendRequest {
+  FileTransferRequest fileTransferRequest = 1;
+  bytes chunk = 2;
+}
+
+message MultiAppendResponse {
+    ResponseType response = 1;
+}
+message MergeResponse {
+    string message = 1;
+    ResponseType response = 2; // Response message
+}
+message MergeRequest {
+    string hydfsFileName = 1; // The HyDFS file being merged
+}
+
+enum ResponseType {
+  SUCCESS = 0;
+  FAIL = 1;
+}
+
+
+message FileSendResponse {
+  string message = 1;
+}
+
+message FileReceiveRequest {
+  string file_id = 1;
+}
+
+message FileReceiveReponse {
+  bytes chunk = 1;
+}
+message FileTransferRequest {
+  int32 SrcNodeId = 1;
+  int32 DestNodeId = 2;
+  int32 SrcPeerd = 3;
+  int32 DestPeerId = 4;
+  string SrcFileName  = 5;
+  string SrcFilePath = 9;
+  string DestFilePath = 10;
+  string DestFileName = 6;
+  bytes FileData = 7;
+  TransferRequestType TransferRequestType=  8;
+  string targetAddr = 11;
+}
+
+
+enum TransferRequestType {
+  CREATE_TransferFileType = 0;
+  APPEND_TransferFileType = 1;
+  AOL_Transfer_TransferFileType = 2;
+  REPLICATE_Transfer_TransferFileType = 3;
+  READ_Transfer = 4;
+  MULTI_APPEND_Transfer = 5;
+  MERGE_Transfer = 6;
+  STREAM_Results = 7;
+
+}
+message FileReadRequest {
+    string hydfsFileName = 1; // The name of the file in HyDFS
+}
+
+message FileReadResponse {
+    bytes chunk = 1; // The chunk of file data being streamed
+}
+
+
+message ReplicateRequest {
+    bytes aolEntry = 1;
+}
+
+message ReplicateResponse {
+    bool success = 1;
+}
+
+
+//protoc --go_out=. --go-grpc_out=. mp3.proto

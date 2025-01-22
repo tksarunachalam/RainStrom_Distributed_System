@@ -1,0 +1,24 @@
+# runtime
+/usr/lib/golang/src/runtime/msize_allocheaders.go:16:6: roundupsize redeclared in this block
+        /usr/lib/golang/src/runtime/msize.go:13:6: other declaration of roundupsize
+/usr/lib/golang/src/runtime/map.go:357:25: too many arguments in call to roundupsize
+        have (uintptr, bool)
+        want (uintptr)
+/usr/lib/golang/src/runtime/slice.go:191:41: too many arguments in call to roundupsize
+        have (uintptr, bool)
+        want (uintptr)
+/usr/lib/golang/src/runtime/slice.go:197:56: too many arguments in call to roundupsize
+        have (uintptr, bool)
+        want (uintptr)
+/usr/lib/golang/src/runtime/slice.go:210:48: too many arguments in call to roundupsize
+        have (uintptr, bool)
+        want (uintptr)
+/usr/lib/golang/src/runtime/slice.go:218:32: too many arguments in call to roundupsize
+        have (uintptr, bool)
+        want (uintptr)
+/usr/lib/golang/src/runtime/string.go:273:36: too many arguments in call to roundupsize
+        have (uintptr, bool)
+        want (uintptr)
+/usr/lib/golang/src/runtime/string.go:288:38: too many arguments in call to roundupsize
+        have (uintptr, bool)
+        want (uintptr)
